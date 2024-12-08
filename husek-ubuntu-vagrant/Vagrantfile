@@ -1,0 +1,32 @@
+IMAGE_NAME = "bento/ubuntu-24.04"
+
+Vagrant.configure("2") do |config|
+    config.ssh.insert_key = false
+
+    config.vm.provider "virtualbox" do |zabbix|
+        zabbix.memory = 2048
+        zabbix.cpus = 2
+    end
+
+    config.vm.define "zabbix" do |zabbix|
+        zabbix.vm.box = IMAGE_NAME
+        zabbix.vm.network "forwarded_port", guest: 22, host: 2202, host_ip: "localhost"
+	zabbix.vm.network "forwarded_port", guest: 80, host: 8081, host_ip: "localhost"
+        zabbix.vm.hostname = "zabbix"
+    end
+
+    config.vm.provision "file", source: "id_rsa.pub", destination: "~/.ssh/me.pub"
+    config.vm.provision "shell", inline: <<-SHELL
+    cat /home/vagrant/.ssh/me.pub >> /home/vagrant/.ssh/authorized_keys
+
+    SHELL
+    config.vm.provision "shell", path: "install-zabbix-agent2.sh"
+
+    # Načtení a provedení scriptu configure-zabbix-agent2.sh
+    config.vm.provision "shell", path: "configure-zabbix-agent2.sh"
+
+    #Načtení a provedení scriptu install-mariadb.sh
+    config.vm.provision "shell", path: "install-mariadb.sh"
+
+    config.vm.provision "shell", path: "zabbix-mariadb-install.sh"
+end
