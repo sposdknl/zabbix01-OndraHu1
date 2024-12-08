@@ -12,3 +12,5 @@
 - Počet jader: 2
 - Memory: 2048 (bohatě stačí :))
 - Porty: 22 -> 2202, 80 -> 8081 (vše na localhostu (127.0.0.1))
+
+### playbook.yml
