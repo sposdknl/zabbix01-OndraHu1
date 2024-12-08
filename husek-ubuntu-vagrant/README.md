@@ -13,4 +13,7 @@
 - Memory: 2048 (bohatě stačí :))
 - Porty: 22 -> 2202, 80 -> 8081 (vše na localhostu (127.0.0.1))
 
-### playbook.yml
+### playbook.yml + Ansible
+- Jsou zde umístěny všechny potřebné závislosti, např. PHP server, MariaDB a config, Zabbix Agent 2 + server
+- Komplexnější a sofistikovanější způsob automatizace
+- Přehledný kód s moduly od Ansible (Hodně pomohl ChatGPT)
