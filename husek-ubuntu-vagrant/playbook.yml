@@ -2,6 +2,11 @@
   become: true
 
   tasks:
+    - name: Install pip3
+      ansible.builtin.yum:
+        name: python3-pip
+        state: present
+
     - name: Install MySQL Python module
       ansible.builtin.pip:
         name: PyMySQL
