@@ -49,13 +49,7 @@
     # Restart Apache pro načtení změn
     sudo systemctl restart apache2
 
-# -> config na php strance od zabbixu
 
-# Zadejte do browseru - http://localhost:8080/zabbix/
-# usr: Admin
-# heslo: zabbix
-
-
-ls -lrth /etc/zabbix/web/zabbix.conf.php
-sudo chmod 400 /etc/zabbix/web/zabbix.conf.php
-ls -lrth /etc/zabbix/web/zabbix.conf.php
+    ls -lrth /etc/zabbix/web/zabbix.conf.php
+    sudo chmod 400 /etc/zabbix/web/zabbix.conf.php
+    ls -lrth /etc/zabbix/web/zabbix.conf.php
