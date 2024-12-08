@@ -1,13 +1,13 @@
 
     # Aktualizace systému
-    sudo apt update
-    sudo apt upgrade -y
+    sudo dnf update
+    sudo dnf upgrade -y
 
     # Instalace základních nástrojů
-    sudo apt install -y wget curl vim gnupg2
+    sudo dnf install -y wget curl vim gnupg2
 
     # Instalace MySQL serveru (MariaDB)
-    sudo apt install -y mariadb-server
+    sudo dnf install -y mariadb-server
     sudo systemctl start mariadb
     sudo systemctl enable mariadb
 
@@ -21,10 +21,10 @@
     # Přidání Zabbix 7.0 LTS repository
     wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_7.0+ubuntu24.04_all.deb
     sudo dpkg -i zabbix-release_latest_7.0+ubuntu24.04_all.deb 
-    sudo apt update
+    sudo dnf update
 
     # Instalace Zabbix serveru, frontend a agenta
-    sudo apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent2
+    sudo dnf install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent2
 
     # Import Zabbix databázové struktury
     sudo zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -pzabbix_password zabbix 
