@@ -1,4 +1,4 @@
-IMAGE_NAME = "bento/ubuntu-24.04"
+IMAGE_NAME = "bento/fedora-latest"
 
 Vagrant.configure("2") do |config|
     config.ssh.insert_key = false
@@ -22,5 +22,5 @@ Vagrant.configure("2") do |config|
     SHELL
 
     config.vm.provision "shell", path: "zabbix-mariadb-install.sh"
-            
+
 end
