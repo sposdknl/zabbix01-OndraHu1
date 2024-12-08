@@ -2,6 +2,11 @@
   become: true
 
   tasks:
+    - name: Install MySQL Python module
+      ansible.builtin.pip:
+        name: PyMySQL
+        state: present
+
     - name: Update system packages
       ansible.builtin.yum:
         name: "*"
@@ -70,10 +75,12 @@
         state: latest
 
     - name: Import Zabbix database schema
-      ansible.builtin.command:
-        cmd: zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -pzabbix_password zabbix
-      args:
-        warn: false
+      ansible.builtin.mysql_db:
+        name: zabbix
+        state: import
+        target: /usr/share/zabbix-sql-scripts/mysql/server.sql.gz
+        login_user: zabbix
+        login_password: zabbix_password
 
     - name: Configure Zabbix server password
       ansible.builtin.lineinfile:
