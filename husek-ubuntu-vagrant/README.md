@@ -17,3 +17,7 @@
 - Jsou zde umístěny všechny potřebné závislosti, např. PHP server, MariaDB a config, Zabbix Agent 2 + server
 - Komplexnější a sofistikovanější způsob automatizace
 - Přehledný kód s moduly od Ansible (Hodně pomohl ChatGPT)
+- Nebudu ho nakonec využívat, nefunguje mi většina věcí, failed
+
+### provision.sh
+- To stejné co playbook.yml, jen v bash :)
