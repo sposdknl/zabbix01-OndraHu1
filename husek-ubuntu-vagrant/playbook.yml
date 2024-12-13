@@ -1,107 +1,105 @@
-- hosts: all
+---
+- name: Install and configure Zabbix server
+  hosts: all
   become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    zabbix_db_user: "zabbix_user"
+    zabbix_db_password: "zabbix_password"
+    zabbix_db_name: "zabbix"
+    php_timezone: "Europe/Prague"
 
   tasks:
-    - name: Install pip3
-      ansible.builtin.yum:
-        name: python3-pip
-        state: present
-
-    - name: Install MySQL Python module
-      ansible.builtin.pip:
-        name: PyMySQL
-        state: present
-
     - name: Update system packages
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: "*"
         state: latest
 
-    - name: Install required tools
-      ansible.builtin.yum:
+    - name: Install essential tools
+      ansible.builtin.dnf:
         name:
           - wget
           - curl
           - vim
           - gnupg2
-        state: latest
-
-    - name: Install MariaDB server
-      ansible.builtin.yum:
-        name:
           - mariadb
           - mariadb-server
-        state: latest
+          - policycoreutils-python-utils
+        state: present
 
     - name: Start and enable MariaDB service
-      ansible.builtin.service:
+      ansible.builtin.systemd:
         name: mariadb
         state: started
         enabled: true
 
-    - name: Create Zabbix database and user
-      ansible.builtin.mysql_db:
-        name: zabbix
-        state: present
-        collation: utf8mb4_bin
-        encoding: utf8mb4
-
-    - name: Create Zabbix user
-      ansible.builtin.mysql_user:
-        name: zabbix
-        password: zabbix_password
-        host: localhost
-        priv: "zabbix.*:ALL"
-        state: present
-
-    - name: Set global MySQL variable for function creators
-      ansible.builtin.mysql_variables:
-        name: log_bin_trust_function_creators
-        value: 1
+    - name: Configure MariaDB for Zabbix
+      ansible.builtin.shell: |
+        mysql -e "CREATE DATABASE {{ zabbix_db_name }} CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;"
+        mysql -e "CREATE USER '{{ zabbix_db_user }}'@'localhost' IDENTIFIED BY '{{ zabbix_db_password }}';"
+        mysql -e "GRANT ALL PRIVILEGES ON {{ zabbix_db_name }}.* TO '{{ zabbix_db_user }}'@'localhost';"
+        mysql -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+        mysql -e "FLUSH PRIVILEGES;"
+      args:
+        executable: /bin/bash
 
     - name: Add Zabbix repository
       ansible.builtin.get_url:
         url: https://repo.zabbix.com/zabbix/7.0/rhel/9/x86_64/zabbix-release-7.0-1.el9.noarch.rpm
         dest: /tmp/zabbix-release.rpm
 
+    - name: Add Zabbix GPG key
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://repo.zabbix.com/zabbix-official-repo.key
+
     - name: Install Zabbix repository
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: /tmp/zabbix-release.rpm
         state: present
 
+
+    - name: Clean DNF cache and make cache
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+        update_cache: yes
+
     - name: Install Zabbix server, frontend, and agent
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name:
           - zabbix-server-mysql
           - zabbix-web-mysql
           - zabbix-web-apache-mysql
           - zabbix-sql-scripts
           - zabbix-agent2
-        state: latest
+        state: present
 
     - name: Import Zabbix database schema
-      ansible.builtin.mysql_db:
-        name: zabbix
-        state: import
-        target: /usr/share/zabbix-sql-scripts/mysql/server.sql.gz
-        login_user: zabbix
-        login_password: zabbix_password
+      ansible.builtin.shell: |
+        zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -u{{ zabbix_db_user }} -p{{ zabbix_db_password }} {{ zabbix_db_name }}
+      args:
+        executable: /bin/bash
 
-    - name: Configure Zabbix server password
+    - name: Disable log_bin_trust_function_creators after import
+      ansible.builtin.shell: |
+        mysql -e "SET GLOBAL log_bin_trust_function_creators = 0;"
+      args:
+        executable: /bin/bash
+
+    - name: Configure Zabbix server database password
       ansible.builtin.lineinfile:
         path: /etc/zabbix/zabbix_server.conf
         regexp: '^# DBPassword='
-        line: 'DBPassword=zabbix_password'
+        line: "DBPassword={{ zabbix_db_password }}"
 
-    - name: Start and enable Zabbix services
-      ansible.builtin.service:
-        name: "{{ item }}"
-        state: started
-        enabled: true
-      loop:
-        - zabbix-server
-        - zabbix-agent2
-        - httpd
+    - name: Configure SELinux for Zabbix web app
+      ansible.builtin.seboolean:
+        name:
+          - httpd_can_connect_zabbix
+          - httpd_can_network_connect_db
+        state: yes
+        persistent: yes
 
     - name: Configure PHP for Zabbix frontend
       ansible.builtin.lineinfile:
@@ -113,9 +111,29 @@
         - { regexp: '^memory_limit = .*', line: 'memory_limit = 128M' }
         - { regexp: '^post_max_size = .*', line: 'post_max_size = 16M' }
         - { regexp: '^upload_max_filesize = .*', line: 'upload_max_filesize = 2M' }
-        - { regexp: '^;date.timezone =.*', line: 'date.timezone = Europe/Prague' }
+        - { regexp: '^;date.timezone =.*', line: 'date.timezone = {{ php_timezone }}' }
 
-    - name: Restart Apache service
-      ansible.builtin.service:
-        name: httpd
+    - name: Set permissions on zabbix.conf.php
+      ansible.builtin.file:
+        path: /etc/zabbix/web/zabbix.conf.php
+        mode: '0400'
+        owner: apache
+        group: apache
+
+    - name: Restart Zabbix server, agent, and Apache
+      ansible.builtin.systemd:
+        name: "{{ item }}"
         state: restarted
+        enabled: true
+      loop:
+        - zabbix-server
+        - zabbix-agent2
+        - httpd
+
+    - name: Display final instructions
+      ansible.builtin.debug:
+        msg: |
+          Zabbix server setup is complete. Access the web interface at http://<your-server-ip>/zabbix
+          Use the following credentials for the initial login:
+          Username: Admin
+          Password: zabbix
