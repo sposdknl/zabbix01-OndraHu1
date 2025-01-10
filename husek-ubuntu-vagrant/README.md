@@ -42,3 +42,6 @@ Skript je napsán v Bash a je spouštěn automaticky při spuštění virtuáln�
 
 ## 6. Shrnutí
 - Práce byla deprimující :(
+- Doufám, že bude nějaké hodnocení z pokusu o Ansible ;)
+- Ve škole mi to ke konci začlo psát chybu po stažení boxu do vagrantu, mělo s tím problém mnoho lidí a nikdo z nás nevěděl, jak se to dá správně opravit. Prosím o shovívavost :)
+
