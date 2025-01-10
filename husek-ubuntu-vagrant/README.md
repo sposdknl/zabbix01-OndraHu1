@@ -17,12 +17,13 @@
 - Jsou zde umístěny všechny potřebné závislosti, např. PHP server, MariaDB a config, Zabbix Agent 2 + server
 - Komplexnější a sofistikovanější způsob automatizace
 - Přehledný kód s moduly od Ansible (Hodně pomohl ChatGPT)
-- Nebudu ho nakonec využívat, nefunguje mi většina věcí, failed
+- Nebudu Ansible nakonec využívat, nefunguje mi většina věcí, failed 5/6 atd.
+- Strávil jsem s tím mnoho času, 3 večery a furt to nefungovalo. Netuším, jak na to.
 
 ### provision.sh
 - To stejné co playbook.yml, jen v bash :)
 - provision.sh: Bash skript pro stejnou instalaci, jako v playbook.yml (slouží jako záloha nebo alternativní řešení).
-- /pics: Adresář pro ukládání screenshotů dokumentujících funkčnost a kroky instalace.
+- Tohle bylo z celého projektu společně s Vagrantfilem to nejlehčí.
 
 ## 3. Instalace Zabbix serveru a agenta
  Skript provision.sh automatizuje instalaci a konfiguraci Zabbix serveru a agenta. Tento skript provádí:
@@ -44,4 +45,7 @@ Skript je napsán v Bash a je spouštěn automaticky při spuštění virtuáln�
 - Práce byla deprimující :(
 - Doufám, že bude nějaké hodnocení z pokusu o Ansible ;)
 - Ve škole mi to ke konci začlo psát chybu po stažení boxu do vagrantu, mělo s tím problém mnoho lidí a nikdo z nás nevěděl, jak se to dá správně opravit. Prosím o shovívavost :)
+- Zkoukněte prosím Commits na GitHubu, mám tam mnoho změn, třeba to známce přilepší. Snažil jsem se to udělat na Fedora distro, avšak není podporované, CentOS nefungoval, s Debianem nebyl žádný problém.
+- ### Jestli najdete podobný až stejný kód, je mnoho lidí kterým jsem s tímto projektem pomáhal. Vše jsem dělal JÁ a SÁM. Děkuji.
+
 
