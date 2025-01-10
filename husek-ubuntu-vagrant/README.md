@@ -21,3 +21,24 @@
 
 ### provision.sh
 - To stejné co playbook.yml, jen v bash :)
+- provision.sh: Bash skript pro stejnou instalaci, jako v playbook.yml (slouží jako záloha nebo alternativní řešení).
+- /pics: Adresář pro ukládání screenshotů dokumentujících funkčnost a kroky instalace.
+
+## 3. Instalace Zabbix serveru a agenta
+ Skript provision.sh automatizuje instalaci a konfiguraci Zabbix serveru a agenta. Tento skript provádí:
+1. Instalace PHP serveru
+2. Instalace a konfigurace MariaDB
+3. Instalace Zabbix serveru a agenta
+4. Nastavení konfiguračních souborů, jako je zabbix_server.conf a zabbix_agent2.conf
+Skript je napsán v Bash a je spouštěn automaticky při spuštění virtuálního stroje pomocí příkazu vagrant up.
+
+## 4. Funkčnost
+- Po řadě zpackaných pokusů jsem to konečně opravil na debian, webový server a zabbix server jede
+- Importoval jsem sposdk hosta v yaml formátu
+- Zkontroloval jsem a zjistil, že vše jede
+
+## 5. Screenshoty
+- Všechny screenshoty se nachází ve složce /pics, avšak není tam vše protože jsem to dělal i na jiných pc, kde se mi nepovedlo udělat screenshot. 
+
+## 6. Shrnutí
+- Práce byla deprimující :(
