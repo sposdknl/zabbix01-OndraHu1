@@ -15,22 +15,22 @@ apt update -y
 # Instalace Zabbix serveru, frontend a agenta
 apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent
 
-# Instalace Apache a MySQL serveru
-apt install -y apache2 mysql-server
+# Instalace MariaDB místo MySQL
+apt install -y mariadb-server
 
-# Vytvoření databáze pro Zabbix
-mysql -uroot -p -e "CREATE DATABASE zabbix character set utf8mb4 collate utf8mb4_bin;"
-mysql -uroot -p -e "CREATE USER 'zabbix'@'localhost' IDENTIFIED BY 'password';"
-mysql -uroot -p -e "GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';"
-mysql -uroot -p -e "SET GLOBAL log_bin_trust_function_creators = 1;"
-mysql -uroot -p -e "QUIT;"
+# Vytvoření databáze pro Zabbix v MariaDB
+mysql -u root -e "CREATE DATABASE zabbix character set utf8mb4 collate utf8mb4_bin;"
+mysql -u root -e "CREATE USER 'zabbix'@'localhost' IDENTIFIED BY 'password';"
+mysql -u root -e "GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';"
+mysql -u root -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+mysql -u root -e "QUIT;"
 
 # Importování schématu a dat do databáze
 zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p zabbix
 
 # Deaktivace log_bin_trust_function_creators po importu
-mysql -uroot -p -e "SET GLOBAL log_bin_trust_function_creators = 0;"
-mysql -uroot -p -e "QUIT;"
+mysql -u root -e "SET GLOBAL log_bin_trust_function_creators = 0;"
+mysql -u root -e "QUIT;"
 
 # Konfigurace Zabbix serveru
 sed -i 's/# DBPassword=/DBPassword=password/' /etc/zabbix/zabbix_server.conf

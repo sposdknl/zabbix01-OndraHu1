@@ -1,1 +1,0 @@
-{"rsync":{"/vagrant":{"type":"rsync","nfs_version":"4","nfs_udp":false,"guestpath":"/vagrant","hostpath":"/home/hushkys/Plocha/ŠKOLA/OSY/zabbix01-OndraHu1/Zabbix-with-libvirt","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}
