@@ -1,0 +1,23 @@
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "debianek"
+
+  config.vm.provider "libvirt" do |libvirt|
+    libvirt.memory = 2048 
+    libvirt.cpus = 2      
+  end
+
+  # Forwardování portů
+  config.vm.network "forwarded_port", guest: 22, host: 2200  # SSH
+  config.vm.network "forwarded_port", guest: 80, host: 8080 # HTTP (volitelné)
+
+  # Název hosta
+  config.vm.hostname = "debian-vagrant"
+
+  # Použití rsync místo NFS pro sdílení složek
+  config.vm.synced_folder ".", "/vagrant", type: "rsync"
+
+  # Spouštění provision.sh
+  config.vm.provision "shell", path: "provision.sh"
+
+end
